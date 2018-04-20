@@ -1,6 +1,12 @@
 [package]
 name = "plugin-command"
 version = "0.1.0"
-authors = ["Innectic <innectic@gmail.com>"]
+authors = ["CactusDev"]
 
 [dependencies]
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+
+ws = { version = "*", git = "https://github.com/housleyjk/ws-rs"}
+cereus = { version = "*", git = "https://github.com/CactusDev/cereus-common" }
