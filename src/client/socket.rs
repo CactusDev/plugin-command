@@ -1,5 +1,5 @@
 
-use serde_json as json;
+use json;
 use ws;
 
 use cereus::*;
