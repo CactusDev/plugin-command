@@ -12,3 +12,5 @@ regex = "0.2"
 
 ws = { version = "*", git = "https://github.com/housleyjk/ws-rs"}
 cereus = { version = "*", git = "https://github.com/CactusDev/cereus-common" }
+
+plugin_command_derive = { path = "../plugin-command-derive" }
