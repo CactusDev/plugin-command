@@ -2,4 +2,5 @@
 use derive::BaseCommand;
 
 #[derive(BaseCommand)]
-pub struct Test;
+#[CommandName = "cactus"]
+pub struct CactusCommand;

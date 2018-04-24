@@ -20,5 +20,8 @@ fn main() {
     println!("{}", a.parse_text_into_terms(String::from("!command add test This is a test, %thing|a|b|c%")).unwrap());
     println!("{}", a.parse_text_into_terms(String::from("!command add test This is a test, %test|a|b|c%")).unwrap());
 
-    command::Test::execute();
+    command::CactusCommand::on(vec! ["docs"], Box::new(|args, sender, channel, whisper| {
+		println!("{:?} {} {} {}", args, sender, channel, whisper);
+		None
+	}));
 }

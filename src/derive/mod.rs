@@ -1,4 +1,4 @@
 
 pub trait BaseCommand {
-	fn execute();
+	fn on(arguments: Vec<&str>, handler: Box<Fn(Vec<String>, String, String, bool) -> Option<String>>);
 }
