@@ -23,20 +23,6 @@ impl fmt::Display for TextTerm {
 	}
 }
 
-pub struct CommandParser {
-	args_regex: Regex,
-	argn_regex: Regex
-}
-
-impl CommandParser {
-	pub fn new() -> Self {
-		CommandParser {
-			args_regex: Regex::new("%ARGS(?:=([^|]+))?((?:\\|\\w+)+)?%").unwrap(),
-			argn_regex: Regex::new("%ARG(\\d+)(?:=([^|]+))?(?:((?:\\|\\w+)+))?%").unwrap()
-		}
-	}
-}
-
 pub struct TermParser;
 
 impl TermParser {
@@ -46,8 +32,8 @@ impl TermParser {
 
 	fn is_valid_variable(&self, variable: &str) -> bool {
 		match variable {
-			"test" => true,
-			_      => false
+			"ARGS" | "COUNT" | "USER" | "CHANNEL" => true,
+			_  => false
 		}
 	}
 
