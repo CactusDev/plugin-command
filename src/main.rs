@@ -13,15 +13,23 @@ mod parser;
 mod derive;
 mod command;
 
-use derive::BaseCommand;
+use derive::{BaseCommand};
+
+// TODO: Make this
+//
+// #[derive(CM)]
+// #[Commands = "CactusCommand"]
+// struct CommandManager;
+//
 
 fn main() {
-	let a = parser::CommandParser::new();
-    println!("{}", a.parse_text_into_terms(String::from("!command add test This is a test, %thing|a|b|c%")).unwrap());
-    println!("{}", a.parse_text_into_terms(String::from("!command add test This is a test, %test|a|b|c%")).unwrap());
+	let a = parser::TermParser::new();
+    println!("{:?}", a.parse_text_into_terms(String::from("!command add test This is a test, %thing|a|b|c%")));
+    println!("{:?}", a.parse_text_into_terms(String::from("!command add test This is a test, %test|a|b|c%")));
 
     command::CactusCommand::on(vec! ["docs"], Box::new(|args, sender, channel, whisper| {
 		println!("{:?} {} {} {}", args, sender, channel, whisper);
 		None
 	}));
+	println!("{}", command::CactusCommand::command_name());
 }

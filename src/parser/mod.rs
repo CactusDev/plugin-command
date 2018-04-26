@@ -5,43 +5,20 @@ use regex::Regex;
 use std::fmt;
 
 #[derive(Debug)]
-pub enum CommandArgument {
+pub enum TextTerm {
 	Text { text: String },
 	Variable { variable: String, modifiers: Vec<String> }
 }
 
-impl fmt::Display for CommandArgument {
+impl fmt::Display for TextTerm {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match self {
-			&CommandArgument::Text {ref text} => {
+			&TextTerm::Text {ref text} => {
 				write!(f, "Text argument: {}", &text)
 			},
-			&CommandArgument::Variable {ref variable, ref modifiers} => {
+			&TextTerm::Variable {ref variable, ref modifiers} => {
 				write!(f, "Variable Argument: {}, with modifiers: {}", &variable, modifiers.join(", "))
 			}
-		}
-	}
-}
-
-pub struct CommandTerms {
-	pub prefix:    char,
-	pub base:      String,
-	pub arguments: Vec<CommandArgument>
-}
-
-impl fmt::Display for CommandTerms {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "{}{}, {:?}", &self.prefix, &self.base, &self.arguments)
-	}
-}
-
-impl CommandTerms {
-
-	pub fn new(prefix: char, base: String, arguments: Vec<CommandArgument>) -> Self {
-		CommandTerms {
-			prefix,
-			base,
-			arguments
 		}
 	}
 }
@@ -58,6 +35,14 @@ impl CommandParser {
 			argn_regex: Regex::new("%ARG(\\d+)(?:=([^|]+))?(?:((?:\\|\\w+)+))?%").unwrap()
 		}
 	}
+}
+
+pub struct TermParser;
+
+impl TermParser {
+	pub fn new() -> Self {
+		TermParser {}
+	}
 
 	fn is_valid_variable(&self, variable: &str) -> bool {
 		match variable {
@@ -66,7 +51,7 @@ impl CommandParser {
 		}
 	}
 
-	pub fn parse_text_into_terms(&self, command: String) -> Option<CommandTerms> {
+	pub fn parse_text_into_terms(&self, command: String) -> Vec<TextTerm> {
 		// Make sure this even looks like a command.
 		let mut chars = command.chars();
 		let prefix = chars.next();
@@ -77,20 +62,15 @@ impl CommandParser {
 				// Since we have at least two characters, then this might actually be
 				// a command. But, if the next character is a space then we don't care
 				if next == ' ' {
-					return None
+					return vec! []
 				}
 			}
 		}
 
 		// Start by splitting the command, and taking out terms that we
 		// can immediately identify.
-		let mut parts: Vec<&str> = command.split(" ").collect();
-		let mut finished: Vec<CommandArgument> = Vec::new();
-
-		let prefix = prefix.unwrap();
-		let base: Vec<char> = parts[0].chars().skip(1).collect();
-
-		parts.remove(0);
+		let parts: Vec<&str> = command.split(" ").collect();
+		let mut finished: Vec<TextTerm> = Vec::new();
 
 		for part in &parts {
 			// Now, we need to figure out if this is just regular text,
@@ -101,7 +81,7 @@ impl CommandParser {
 					// If it doesn't end with a %, then it can't be one
 					// So, we're going to call this a regular text block.
 					//
-					finished.push(CommandArgument::Text {text: part.to_string()});
+					finished.push(TextTerm::Text {text: part.to_string()});
 					continue;
 				}
 				// Since it starts and ends with a %, we can infer that this is
@@ -120,21 +100,21 @@ impl CommandParser {
 				if !self.is_valid_variable(variable) {
 					// It's not, so we're going to call this a regular text
 					// block.
-					finished.push(CommandArgument::Text {text: part.to_string()});
+					finished.push(TextTerm::Text {text: part.to_string()});
 					continue;
 				}
 				// Valid variable, so we can finally commit this one.
-				finished.push(CommandArgument::Variable {
+				finished.push(TextTerm::Variable {
 					variable: variable.to_string(),
 					modifiers: modifiers.iter().map(|s| s.to_string()).collect()
 				});
 				continue;
 			}
 			// This segment is not a variable, thus it must be text.
-			finished.push(CommandArgument::Text {
+			finished.push(TextTerm::Text {
 				text: part.to_string()
 			});
 		}
-		Some(CommandTerms::new(prefix, base.into_iter().collect::<String>(), finished))
+		finished
 	}
 }
